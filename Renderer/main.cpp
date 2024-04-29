@@ -4,51 +4,67 @@
 #include <iostream>
 #include <vector>
 
+#include "Config.h"
 #include "Shader.h"
 #include "Beizier.h"
 #include "BSpline.h"
 #include "InputProcessor.h"
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-inline GLFWwindow* InitGLFW();
 
-// settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
-InputProcessor input;
+extern unsigned int SCR_WIDTH, SCR_HEIGHT;
+extern double xMouse, yMouse;
+extern double xLastMouse, yLastMouse;
+extern double xClick, yClick;
+extern void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+extern void mouse_position_callback(GLFWwindow* window, double xpos, double ypos);
+extern inline void processInput(GLFWwindow* window);
 
 
 int main()
 {
-    GLFWwindow* window = InitGLFW();
+    //启动Opengl
+    glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    if (window == nullptr)
+    //创建窗口
+    GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
+    if (window == NULL)
+    {
+        std::cout << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
         return -1;
+    }
+    glfwMakeContextCurrent(window);
 
-    input.setWindow(window);
-    input.setFramebufferSizeCallback(framebuffer_size_callback);
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        return -1;
+    }
+
+    //视口
+    glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+
+    //设置响应函数
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, mouse_position_callback);
+
     Beizier b;
     BSpline bs;
 
     while (!glfwWindowShouldClose(window))
     {
         //input process
-        input.process();
+
+        processInput(window);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        if (input.getSignal(GLFW_MOUSE_BUTTON_LEFT)) {
-            std::pair<float, float> ClickLocation = input.getMouseClickLocation();
-            float xpos, ypos;
-            xpos = (ClickLocation.first / SCR_WIDTH - 0.5) * 2;
-            ypos = (0.5 - ClickLocation.second / SCR_HEIGHT) * 2;
-            bs.addControlPoints(xpos, ypos);
-        }
+        if (glfwGetKey(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+            bs.addControlPoints(xClick, yClick);
         bs.Draw();
-        if (input.getSignal(GLFW_KEY_Q)) 
-            bs.clear();
-
-        input.clearSignal();
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -58,33 +74,6 @@ int main()
     return 0;
 }
 
-inline GLFWwindow* InitGLFW() {
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
-
-    if (window == NULL)
-    {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return nullptr;
-    }
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return nullptr;
-    }
-    return window;
-}
 
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    glViewport(0, 0, width, height);
-}
+
