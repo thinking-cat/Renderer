@@ -20,7 +20,6 @@ Beizier::Beizier() {
 }
 
 inline void Beizier::Draw() {
-	std::cout << controlPoints.size() << std::endl;
 	DrawPoints(VAOpos, VBOpos, IDpos, controlPoints);
 
 	if (controlPoints.size() < 8)

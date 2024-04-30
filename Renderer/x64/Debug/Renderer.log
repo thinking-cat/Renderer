@@ -1,8 +1,5 @@
 ﻿  main.cpp
-D:\Renderer\Renderer\include\Eigen\src\Core\arch\Default\Half.h(1,1): warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
-D:\Renderer\Renderer\include\Eigen\src\Core\arch\Default\BFloat16.h(1,1): warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
-D:\Renderer\Renderer\include\Eigen\src\Core\arch\Default\GenericPacketMathFunctions.h(676,1): warning C4819: The file contains a character that cannot be represented in the current code page (936). Save the file in Unicode format to prevent data loss
-D:\Renderer\Renderer\Renderer\Spline.h(29,43): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-D:\Renderer\Renderer\Renderer\main.cpp(66,41): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-D:\Renderer\Renderer\Renderer\main.cpp(66,33): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-  Renderer.vcxproj -> D:\Renderer\Renderer\x64\Debug\Renderer.exe
+D:\Renderer\Renderer\Spline.h(29,43): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+  (compiling source file 'main.cpp')
+  
+  Renderer.vcxproj -> D:\Renderer\x64\Debug\Renderer.exe

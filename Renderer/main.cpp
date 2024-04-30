@@ -8,28 +8,17 @@
 #include "Shader.h"
 #include "Beizier.h"
 #include "BSpline.h"
-#include "InputProcessor.h"
-
-
-extern unsigned int SCR_WIDTH, SCR_HEIGHT;
-extern double xMouse, yMouse;
-extern double xLastMouse, yLastMouse;
-extern double xClick, yClick;
-extern void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-extern void mouse_position_callback(GLFWwindow* window, double xpos, double ypos);
-extern inline void processInput(GLFWwindow* window);
-
 
 int main()
 {
-    //启动Opengl
+    //Initialize Opengl
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    //创建窗口
-    GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
+    //Create Window
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -44,32 +33,57 @@ int main()
         return -1;
     }
 
-    //视口
+    //Viewport
     glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 
-    //设置响应函数
+    //Set Callback Funtion
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_position_callback);
+    glfwSetMouseButtonCallback(window, MouseButtonCallback);
+
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplGlfw_InitForOpenGL(window, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+    ImGui_ImplOpenGL3_Init("#version 330");
 
     Beizier b;
     BSpline bs;
+
+    MyUI UI;
 
     while (!glfwWindowShouldClose(window))
     {
         //input process
 
         processInput(window);
+        //imgui start setting
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        ImGui::ShowDemoWindow(); // Show demo window! :)
 
+
+        //rendering loop
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        if (glfwGetKey(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-            bs.addControlPoints(xClick, yClick);
-        bs.Draw();
+
+        UI.render();
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
     glfwTerminate();
     return 0;
 }
